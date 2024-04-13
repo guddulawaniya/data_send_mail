@@ -1,24 +1,6 @@
 import 'package:flutter/material.dart';
 
 
-class CustomAutocomplete extends StatefulWidget {
-  final String text;
-  final String hinttext;
-  final List<String> items;
-  final ValueChanged<String>? onChanged;
-
-  const CustomAutocomplete({
-    Key? key,
-    required this.text,
-    required this.hinttext,
-    required this.items,
-    this.onChanged,
-  }) : super(key: key);
-
-  @override
-  _CustomAutocompleteState createState() => _CustomAutocompleteState();
-}
-
 class _CustomAutocompleteState extends State<CustomAutocomplete> {
   String? dropdownValue;
 
@@ -89,4 +71,22 @@ class _CustomAutocompleteState extends State<CustomAutocomplete> {
     );
 
   }
+}
+
+class CustomAutocomplete extends StatefulWidget {
+  final String text;
+  final String hinttext;
+  final List<String> items;
+  final ValueChanged<String>? onChanged;
+
+  const CustomAutocomplete({
+    Key? key,
+    required this.text,
+    required this.hinttext,
+    required this.items,
+    this.onChanged,
+  }) : super(key: key);
+
+  @override
+  _CustomAutocompleteState createState() => _CustomAutocompleteState();
 }
