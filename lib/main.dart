@@ -4,7 +4,6 @@ import 'package:data_send_mail/SplashScreen.dart';
 import 'package:data_send_mail/login.dart';
 import 'package:data_send_mail/otp_verification.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 
@@ -25,7 +24,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: "splash",
       routes: {
-        'splash': (context) => splashScreen(),
+        'splash': (context) => SplashScreen(),
         '/login': (context) => loginpage(),
         '/mainepage': (context) => MyHomePage(
               title: 'home page',
@@ -68,7 +67,9 @@ TextEditingController _userNameController = TextEditingController();
 TextEditingController _simnumberController = TextEditingController();
 TextEditingController _imeinumberController = TextEditingController();
 TextEditingController _cityController = TextEditingController();
-// TextEditingController _imeinumberController = TextEditingController();
+TextEditingController _devicenumberController = TextEditingController();
+TextEditingController _othercountryController = TextEditingController();
+TextEditingController _otherstateController = TextEditingController();
 
 // Collect user data
 String dealer = _dealerController.text;
@@ -81,14 +82,12 @@ String userName = _userNameController.text;
 String city = _cityController.text;
 String imei = _imeinumberController.text;
 String sim = _simnumberController.text;
+String deviceModel = _devicenumberController.text;
 
 String vehicleType = _selectedVehicleType ?? '';
-String deviceModel = _selectedDeviceModel ?? '';
 String userType = _selectedUserType ?? '';
 String country = _selectedCountry ?? '';
 String state = _selectedState ?? '';
-
-
 
 void registerUser(BuildContext context) {
   // Validate all form fields
@@ -97,7 +96,6 @@ void registerUser(BuildContext context) {
   if (!isValid) {
     return;
   }
-
 }
 
 @override
@@ -114,6 +112,8 @@ void dispose() {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool isNewUser = true;
+  bool countyother = false;
+  bool stateother = false;
 
   @override
   void initState() {
@@ -122,10 +122,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Validation function for the Dealer Code field
   String? _validateDealerCode(String? value) {
+    // Fluttertoast.showToast(msg: '$value');
+
     if (value == null || value.isEmpty) {
+      // Fluttertoast.showToast(msg: '$value '+'in');
       return 'Please enter the Dealer Code';
     }
-    return null; // Return null if validation passes
+    // Fluttertoast.showToast(msg: '$value');
+    return null;
+
+    // Retur// n null if validation passes
   }
 
 // Validation function for the IMEI Number field
@@ -214,7 +220,68 @@ class _MyHomePageState extends State<MyHomePage> {
     return null; // Return null if validation passes
   }
 
+  String? _validatedevice(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter Your Name';
+    }
+    return null; // Return null if validation passes
+  }
+
+  String? _validateOtherState(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter State';
+    }
+    return null; // Return null if validation passes
+  }
+
+  String? _ValidateOtherCountry(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter Country';
+    }
+    return null; // Return null if validation passes
+  }
+
   bool isLoading = false;
+  void showSuccessDialog(BuildContext context,String msg,String title) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // title: Text('Email Sent Successfully'),
+          title: Text(title),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Text('Message has been sent successfully.'),
+              Text(msg),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Clear the text fields
+                _dealerController.text = "";
+                _nameController.text = "";
+                _mobileNumberController.text = "";
+                _pincodeController.text = '';
+                _emailController.text = '';
+                _addressController.text = '';
+                _userNameController.text = '';
+                _cityController.text = '';
+                _imeinumberController.text = '';
+                _emailController.text = '';
+                // Close the dialog
+                Navigator.of(context).pop();
+              },
+              child: Text('Ok'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   Future<void> sendEmailOTPssl(BuildContext context) async {
     setState(() {
@@ -224,6 +291,10 @@ class _MyHomePageState extends State<MyHomePage> {
     // Replace these with your actual Gmail credentials
     final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
     final password = 'Ankit@123\$#'; // Your Gmail password
+
+    // Replace these with your actual Gmail credentials
+    // const username = 'sales@lostmod.com'; // Your Gmail username
+    // const password = 'mO2IAQQ6R@1'; // Your Gmail password
 
     // Recipient email address
     final destinationMail = 'guddulawaniya123@gmail.com';
@@ -236,9 +307,9 @@ class _MyHomePageState extends State<MyHomePage> {
       port: 465,
       ssl: true,
     );
+    bool isSendcheck = false;
 
-    final recipients = ['test@braj.tbvcsoft.com','guddulawaniya123@gmail.com'];
-
+    final recipients = ['test@braj.tbvcsoft.com', 'guddulawaniya123@gmail.com'];
 
     // Create email message
     final message = Message()
@@ -254,41 +325,9 @@ class _MyHomePageState extends State<MyHomePage> {
       try {
         // Send email
         final sendReport = await send(message, smtpServer);
-        print('Message sent to $recipient: $sendReport');
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Email Send Successfully'),
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Message sent to $recipient: $sendReport'),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    _dealerController.text= "";
-                    _nameController.text = "";
-                    _mobileNumberController.text="";
-                    _pincodeController.text='';
-                    _emailController.text='';
-                    _addressController.text='';
-                    _userNameController.text='';
-                    _cityController.text='';
-                    _imeinumberController.text='';
-                    _emailController.text= '';
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: Text('Ok'),
-                ),
-              ],
-            );
-          },
-        );
+        showSuccessDialog(context,'Message has been sent successfully','Email Sent Successfully');
       } catch (e) {
+        showSuccessDialog(context,'Message has been not sent successfully','Failed to send message');
         print('Failed to send message to $recipient: $e');
         // Handle error for individual recipient
       }
@@ -301,6 +340,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  String? _error;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -310,7 +351,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
-        Container(
+          Container(
             decoration: BoxDecoration(color: Colors.white),
             child: Form(
               key: _formKey,
@@ -324,14 +365,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-
                             CustomTextView(
                               text: "Dealer Code ",
                               hinttext: 'Dealer Code',
                               controller: _dealerController,
                               validator: _validateDealerCode,
                               onChanged: (String value) {
-                                  registerUser(context);
+                                setState(() {
+                                  if(value==null || value.isEmpty)
+                                    {
+                                      registerUser(context);
+                                    }
+                                });
                               },
                               inputType: TextInputType.number,
                             ),
@@ -341,7 +386,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               controller: _imeinumberController,
                               validator: _validateIMEINumber,
                               onChanged: (String value) {
-                                registerUser(context);
+                                if(value==null || value.isEmpty)
+                                {
+                                  registerUser(context);
+                                }
                               },
                               inputType: TextInputType.number,
                             ),
@@ -351,7 +399,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               controller: _simnumberController,
                               validator: _validateSimNumber,
                               onChanged: (String value) {
-                                registerUser(context);
+                                if(value==null || value.isEmpty)
+                                {
+                                  registerUser(context);
+                                }
                               },
                               inputType: TextInputType.number,
                             ),
@@ -370,20 +421,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                 _selectedVehicleType = value;
                               },
                             ),
-                            CustomAutocomplete(
+                            CustomTextView(
                               text: "Select Device Model",
                               hinttext: 'Pl06',
-                              items: devicelist,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter a vehicle type';
-                                }
-                                // Add more validation logic if needed
-                                return null; // Return null if validation passes
-                              },
+                              validator: _validatedevice,
                               onChanged: (value) {
                                 _selectedDeviceModel = value;
                               },
+                              controller: _devicenumberController,
+                              inputType: TextInputType.text,
                             ),
                             CustomAutocomplete(
                               text: "New user ",
@@ -411,7 +457,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 controller: _nameController,
                                 validator: _validateName,
                                 onChanged: (String value) {
-                                  registerUser(context);
+                                  if(value==null || value.isEmpty)
+                                  {
+                                    registerUser(context);
+                                  }
                                 },
                                 inputType: TextInputType.text,
                               ),
@@ -425,7 +474,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 controller: _mobileNumberController,
                                 validator: _validateMobilenumber,
                                 onChanged: (String value) {
-                                  registerUser(context);
+                                  if(value==null || value.isEmpty)
+                                  {
+                                    registerUser(context);
+                                  }
                                 },
                                 inputType: TextInputType.number,
                               ),
@@ -438,8 +490,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                 items: countrylist,
                                 validator: _validateCountryselect,
                                 onChanged: (value) {
+                                  setState(() {
+                                    _selectedCountry = value;
+                                    // Check if the selected value is 'OTHER'
+                                    if (value == 'OTHER') {
+                                      countyother = true;
+                                    } else {
+                                      countyother =
+                                          false; // Reset to false if it's not 'OTHER'
+                                    }
+                                  });
+                                },
+                              ),
+                            ),
+                            Visibility(
+                              visible: countyother,
+                              child: CustomTextView(
+                                text: "Country ",
+                                hinttext: 'Enter Country',
+                                controller: _othercountryController,
+                                validator: _ValidateOtherCountry,
+                                onChanged: (value) {
+                                  registerUser(context);
                                   _selectedCountry = value;
                                 },
+                                inputType: TextInputType.streetAddress,
                               ),
                             ),
                             Visibility(
@@ -449,6 +524,24 @@ class _MyHomePageState extends State<MyHomePage> {
                                 hinttext: 'Select State',
                                 items: statelist,
                                 validator: _validateStateselect,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedCountry = value;
+                                    if (value == 'OTHER') {
+                                      stateother = true;
+                                    }
+                                  });
+                                },
+                              ),
+                            ),
+                            Visibility(
+                              visible: stateother,
+                              child: CustomTextView(
+                                text: "State ",
+                                hinttext: 'Enter State',
+                                validator: _validateOtherState,
+                                controller: _otherstateController,
+                                inputType: TextInputType.text,
                                 onChanged: (value) {
                                   _selectedState = value;
                                 },
@@ -462,7 +555,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 controller: _cityController,
                                 validator: _validateCity,
                                 onChanged: (String value) {
-                                  registerUser(context);
+                                  if(value==null || value.isEmpty)
+                                  {
+                                    registerUser(context);
+                                  }
                                 },
                                 inputType: TextInputType.streetAddress,
                               ),
@@ -475,7 +571,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 controller: _pincodeController,
                                 validator: _validatePincode,
                                 onChanged: (String value) {
-                                  registerUser(context);
+                                  if(value==null || value.isEmpty)
+                                  {
+                                    registerUser(context);
+                                  }
                                 },
                                 maxlenght: 6,
                                 inputType: TextInputType.number,
@@ -489,8 +588,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                 controller: _emailController,
                                 validator: _validateEmail,
                                 onChanged: (String value) {
-                                  registerUser(context);
-                                },inputType: TextInputType.emailAddress,
+                                  if(value==null || value.isEmpty)
+                                  {
+                                    registerUser(context);
+                                  }
+                                },
+                                inputType: TextInputType.emailAddress,
                               ),
                             ),
                             Visibility(
@@ -501,8 +604,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                 controller: _addressController,
                                 validator: _validateAddress,
                                 onChanged: (String value) {
-                                  registerUser(context);
-                                }, inputType: TextInputType.streetAddress,
+                                  if(value==null || value.isEmpty)
+                                  {
+                                    registerUser(context);
+                                  }
+                                },
+                                inputType: TextInputType.streetAddress,
                               ),
                             ),
                             CustomTextView(
@@ -511,7 +618,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               controller: _userNameController,
                               validator: _validateUserName,
                               onChanged: (String value) {
-                                registerUser(context);
+                                if(value==null || value.isEmpty)
+                                {
+                                  registerUser(context);
+                                }
                               },
                               inputType: TextInputType.text,
                             ),
@@ -529,15 +639,16 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: TextButton(
                               style: ButtonStyle(
                                 backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.blue),
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.blue),
                               ),
                               onPressed: () {
                                 // _isValidallfields = false;
-                                final bool isValid = _formKey.currentState!.validate();
-                                if (isValid)
-                                  {
-                                    sendEmailOTPssl(context);
-                                  }
+                                final bool isValid =
+                                    _formKey.currentState!.validate();
+                                if (isValid) {
+                                  sendEmailOTPssl(context);
+                                }
 
                                 // Show alert dialog with user data
                               },

@@ -8,6 +8,8 @@ import 'package:mailer/smtp_server.dart';
 import 'main.dart';
 
 
+
+
 Future<void> sendEmailOTP() async {
 
 
@@ -241,7 +243,7 @@ List<String> vehiclelist = [
   'TRACTOR',
   'STUDENT',
   'EMPLOYEE',
-  'JBB',
+  'JCB',
   'BAG',
   'DOG',
   'JEEP',

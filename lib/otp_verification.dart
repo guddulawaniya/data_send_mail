@@ -2,6 +2,7 @@
 import 'package:data_send_mail/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 
 class otp_verification extends StatefulWidget {
@@ -11,8 +12,10 @@ class otp_verification extends StatefulWidget {
   State<otp_verification> createState() => _otp_verificationState();
 }
 
+
 class _otp_verificationState extends State<otp_verification> {
   bool isvlaid = false;
+  bool finalcheck = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +48,7 @@ class _otp_verificationState extends State<otp_verification> {
 
                 OtpTextField(
                   numberOfFields: 4,
-                  borderColor: const Color(0xFF512DA8),
+                  borderColor: Colors.blue.shade300,
                   //set to true to show as box or false to show as dash
                   showFieldAsBox: true,
                   //runs when a code is typed in
@@ -61,18 +64,26 @@ class _otp_verificationState extends State<otp_verification> {
                     //handle validation or checks here
                   },
 
-                  //runs when every textfield is filled
-                  // onSubmit: (String verificationCode){
-                  //   showDialog(
-                  //       context: context,
-                  //       builder: (context){
-                  //         return AlertDialog(
-                  //           title: const Text("Verification Code"),
-                  //           content: Text('Code entered is $verificationCode'),
-                  //         );
-                  //       }
-                  //   );
-                  // }, // end onSubmit
+                  // runs when every textfield is filled
+                  onSubmit: (String verificationCode){
+                    if (verificationCode=='1971')
+                      {
+                        finalcheck= true;
+                      }
+                    else {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Verification Code"),
+                              content: Text(
+                                  'Invalid Code $verificationCode'),
+                            );
+                          }
+                      );
+                    }
+
+                  }, // end onSubmit
                 ),
 
 
@@ -84,21 +95,32 @@ class _otp_verificationState extends State<otp_verification> {
               child:Column(
               children: [
                 SizedBox(width: double.infinity,
-                  
                   child:  TextButton(
                     style: ButtonStyle(
 
                       backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
                     ),
                     onPressed: () {
-                      // if(isvlaid)
-                      //   {
+                      if(finalcheck)
+                        {
                           Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) =>  MyHomePage(title: "Form Registration")),
                         );
 
-                        // }
+                        }else
+                          {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text("Verification Code"),
+                                    content: Text(
+                                        'Please Enter Valid OTP'),
+                                  );
+                                }
+                            );
+                          }
 
 
                     },

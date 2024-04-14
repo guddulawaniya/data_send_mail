@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class CustomTextView extends StatefulWidget {
   final String text;
+  final String? errortext;
   final String hinttext;
   final TextEditingController controller;
   final String? Function(String?)? validator;
@@ -17,8 +18,8 @@ class CustomTextView extends StatefulWidget {
     required this.controller,
     this.validator,
     this.onChanged,
-    this.maxlenght,
-    required this.inputType,
+    this.errortext,
+    required this.inputType, this.maxlenght,
   }) : super(key: key);
 
   @override
@@ -61,15 +62,8 @@ class _CustomTextViewState extends State<CustomTextView> {
             controller: widget.controller,
             keyboardType: widget.inputType,
             maxLength: widget.maxlenght,
+            onChanged: widget.onChanged,
             autocorrect: true,
-            onChanged: (value) {
-              setState(() {
-                _errorText = null; // Clear error message on text change
-              });
-              if (widget.onChanged != null) {
-                widget.onChanged!(value); // Call onChanged callback
-              }
-            },
             validator: (value) {
               if (widget.validator != null) {
                 return widget.validator!(value); // Validate input
@@ -81,13 +75,8 @@ class _CustomTextViewState extends State<CustomTextView> {
               hintText: widget.hinttext,
               counterText: "",
               border: const OutlineInputBorder(),
-              errorText: _errorText, // Show error message
+              errorText: widget.errortext, // Show error message
             ),
-            onTap: () {
-              setState(() {
-                _errorText = null; // Clear error message on tap
-              });
-            },
           )
         ],
       ),
