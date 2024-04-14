@@ -62,17 +62,17 @@ class _otp_verificationState extends State<otp_verification> {
                   },
 
                   //runs when every textfield is filled
-                  onSubmit: (String verificationCode){
-                    showDialog(
-                        context: context,
-                        builder: (context){
-                          return AlertDialog(
-                            title: const Text("Verification Code"),
-                            content: Text('Code entered is $verificationCode'),
-                          );
-                        }
-                    );
-                  }, // end onSubmit
+                  // onSubmit: (String verificationCode){
+                  //   showDialog(
+                  //       context: context,
+                  //       builder: (context){
+                  //         return AlertDialog(
+                  //           title: const Text("Verification Code"),
+                  //           content: Text('Code entered is $verificationCode'),
+                  //         );
+                  //       }
+                  //   );
+                  // }, // end onSubmit
                 ),
 
 

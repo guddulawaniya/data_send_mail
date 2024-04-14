@@ -1,3 +1,194 @@
+
+//worked normal gsmtp account
+import 'package:flutter/cupertino.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
+
+import 'main.dart';
+
+
+Future<void> sendEmailOTP() async {
+  // Replace these with your actual Gmail credentials
+  final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
+  final password = 'Ankit@123\$#'; // Your Gmail password
+
+  // Recipient email address
+  final destinationMail = 'guddulawaniya123@gmail.com';
+
+  // Create SMTP server configuration
+  final smtpServer = gmail(username, password);
+
+  // Create email message
+  final message = Message()
+    ..from = Address(username, 'Testing mail')
+    ..recipients.add(destinationMail)
+    ..subject = 'Testing purpose'
+    ..text = 'guddulawaniya sending the sms for testing purpose';
+
+  try {
+    // Send email
+    final sendReport = await send(message, smtpServer);
+    print('Message sent: $sendReport');
+  } on MailerException catch (e) {
+    print('Message not sent: ${e.toString()}');
+    // Handle specific problems
+    for (var p in e.problems) {
+      print('Problem: ${p.code}: ${p.msg}');
+    }
+  } catch (e) {
+    // Handle other exceptions
+    print('Unexpected error: $e');
+  }
+}
+
+
+// use hosted mail account on server
+Future<void> sendEmailOTPssl() async {
+  // Replace these with your actual Gmail credentials
+  // final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
+  final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
+  final password = 'Ankit@123\$#'; // Your Gmail password
+
+  // Recipient email address
+  final destinationMail = 'guddulawaniya123@gmail.com';
+
+  // Specify the SMTP server details including port for SSL
+  final smtpServer = SmtpServer(
+    'smtp.hostinger.com',
+    username: username,
+    password: password,
+    port: 465,
+    ssl: true,
+  );
+
+  final recipients = ['guddulawaniya123@gmail.com', 'test@braj.tbvcsoft.com','dealer@lostmod.com'];
+
+
+
+  // Create email message
+  final message = Message()
+    ..from = Address(username, 'Testing mail')
+    ..recipients.add(email)
+    ..subject = 'Testing purpose'
+  ..html = generateHtmlEmail();
+
+
+  for (final recipient in recipients) {
+    // Set the recipient email address
+    message.recipients.add(recipient);
+
+    try {
+      // Send email
+      final sendReport = await send(message, smtpServer);
+      print('Message sent to $recipient: $sendReport');
+    } catch (e) {
+      print('Failed to send message to $recipient: $e');
+      // Handle error for individual recipient
+    }
+
+    // Clear recipients list for the next iteration
+    message.recipients.clear();
+  }
+
+  try {
+    // Send email
+    final sendReport = await send(message, smtpServer);
+    print('Message sent: $sendReport');
+  } on MailerException catch (e) {
+    print('Message not sent: ${e.toString()}');
+    // Handle specific problems
+    for (var p in e.problems) {
+      print('Problem: ${p.code}: ${p.msg}');
+    }
+  } catch (e) {
+    // Handle other exceptions
+    print('Unexpected error: $e');
+  }
+}
+
+String generateHtmlEmail() {
+  return '''
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Email Template</title>
+</head>
+<body>
+  <div style="font-family: Arial, sans-serif;">
+    <h2 style="color: #007bff;">Testing Email Template</h2>
+       <table border="1">
+                                              <tr>
+                                                <th>Field</th>
+                                                <th>Value</th>
+                                              </tr>
+                                              <tr>
+                                                <td>Name</td>
+                                                <td>$name</td>
+                                              </tr>
+                                              <tr>
+                                                <td>DealerCode</td>
+                                                <td>$dealer</td>
+                                              </tr>
+                                              <tr>
+                                                <td>IMEI</td>
+                                                <td>$imei</td>
+                                              </tr>
+                                              <tr>
+                                                <td>SIM</td>
+                                                <td>$sim</td>
+                                              </tr>
+                                              <tr>
+                                                <td>Mobile Number</td>
+                                                <td>$mobileNumber</td>
+                                              </tr>
+                                              <tr>
+                                                <td>Pincode</td>
+                                                <td>$pincode</td>
+                                              </tr>
+                                              <tr>
+                                                <td>Email</td>
+                                                <td>$email</td>
+                                              </tr>
+                                              <tr>
+                                                <td>Address</td>
+                                                <td>$address</td>
+                                              </tr>
+                                              <tr>
+                                                <td>User Name</td>
+                                                <td>$userName</td>
+                                              </tr>
+                                              <tr>
+                                                <td>Vehicle Type</td>
+                                                <td>$vehicleType</td>
+                                              </tr>
+                                              <tr>
+                                                <td>Device Model</td>
+                                                <td>$deviceModel</td>
+                                              </tr>
+                                              <tr>
+                                                <td>User Type</td>
+                                                <td>$userType</td>
+                                              </tr>
+                                              <tr>
+                                                <td>Country</td>
+                                                <td>$country</td>
+                                              </tr>
+                                              <tr>
+                                                <td>State</td>
+                                                <td>$state</td>
+                                              </tr>
+                                              <tr>
+                                                <td>City</td>
+                                                <td>$city</td>
+                                              </tr>
+                                            </table>
+  </div>
+</body>
+</html>
+  ''';
+}
+
+
 List<String> vehiclelist = [
   'BUS',
   'CAR',
@@ -17,7 +208,9 @@ List<String> vehiclelist = [
   'TRAIN',
 ];
 
+
 List<String> userlist = ['New User', 'Already Have Account'];
+List<String> devicelist =['P106', 'P1062',];
 List<String> countrylist = [
   'INDIA',
   'NEPAL',

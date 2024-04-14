@@ -3,12 +3,7 @@ import 'package:data_send_mail/CustomTextView.dart';
 import 'package:data_send_mail/SplashScreen.dart';
 import 'package:data_send_mail/login.dart';
 import 'package:data_send_mail/otp_verification.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import 'content_provider.dart';
 
@@ -25,11 +20,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Form',
       debugShowCheckedModeBanner: false,
-      // initialRoute: "splash",
+      initialRoute: "splash",
       routes: {
         'splash': (context) => splashScreen(),
         '/login': (context) => loginpage(),
-        '/mainepage': (context) => MyHomePage(title: 'home page',),
+        '/mainepage': (context) => MyHomePage(
+              title: 'home page',
+            ),
         '/otppage': (context) => otp_verification(),
       },
       theme: ThemeData(
@@ -46,7 +43,6 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -60,38 +56,42 @@ String? _selectedCountry;
 String? _selectedState;
 String? _selectedCity;
 
+TextEditingController _dealerController = TextEditingController();
 TextEditingController _nameController = TextEditingController();
 TextEditingController _mobileNumberController = TextEditingController();
 TextEditingController _pincodeController = TextEditingController();
 TextEditingController _emailController = TextEditingController();
 TextEditingController _addressController = TextEditingController();
 TextEditingController _userNameController = TextEditingController();
+TextEditingController _simnumberController = TextEditingController();
+TextEditingController _imeinumberController = TextEditingController();
+TextEditingController _cityController = TextEditingController();
+// TextEditingController _imeinumberController = TextEditingController();
 
-void registerUser() {
-  // Perform registration logic here
-  String name = _nameController.text;
-  String mobileNumber = _mobileNumberController.text;
-  String pincode = _pincodeController.text;
-  String email = _emailController.text;
-  String address = _addressController.text;
-  String userName = _userNameController.text;
-  String vehicleType = _selectedVehicleType ?? '';
-  String deviceModel = _selectedDeviceModel ?? '';
-  String userType = _selectedUserType ?? '';
-  String country = _selectedCountry ?? '';
-  String state = _selectedState ?? '';
-  String city = _selectedCity ?? '';
+// Collect user data
+String dealer = _dealerController.text;
+String name = _nameController.text;
+String mobileNumber = _mobileNumberController.text;
+String pincode = _pincodeController.text;
+String email = _emailController.text;
+String address = _addressController.text;
+String userName = _userNameController.text;
+String city = _cityController.text;
+String imei = _imeinumberController.text;
+String sim = _simnumberController.text;
 
-  // Perform registration logic with the collected data
-  // For example, you can show a toast message
-  Fluttertoast.showToast(
-    msg: "User Registered: $name, $mobileNumber, $email",
-    toastLength: Toast.LENGTH_SHORT,
-    gravity: ToastGravity.BOTTOM,
-    backgroundColor: Colors.black,
-    textColor: Colors.white,
-    fontSize: 16.0,
-  );
+String vehicleType = _selectedVehicleType ?? '';
+String deviceModel = _selectedDeviceModel ?? '';
+String userType = _selectedUserType ?? '';
+String country = _selectedCountry ?? '';
+String state = _selectedState ?? '';
+
+void registerUser(BuildContext context) {
+  // Validate all form fields
+  final bool isValid = _formKey.currentState!.validate();
+  if (!isValid) {
+    return;
+  }
 }
 
 @override
@@ -106,99 +106,110 @@ void dispose() {
   // super.dispose();
 }
 
-
-
-
 class _MyHomePageState extends State<MyHomePage> {
-
   bool isNewUser = true;
-
-  //worked normal gsmtp account
-  Future<void> sendEmailOTP() async {
-    // Replace these with your actual Gmail credentials
-    final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
-    final password = 'Ankit@123\$#'; // Your Gmail password
-
-    // Recipient email address
-    final destinationMail = 'guddulawaniya123@gmail.com';
-
-    // Create SMTP server configuration
-    final smtpServer = gmail(username, password);
-
-    // Create email message
-    final message = Message()
-      ..from = Address(username, 'Testing mail')
-      ..recipients.add(destinationMail)
-      ..subject = 'Testing purpose'
-      ..text = 'guddulawaniya sending the sms for testing purpose';
-
-    try {
-      // Send email
-      final sendReport = await send(message, smtpServer);
-      print('Message sent: $sendReport');
-    } on MailerException catch (e) {
-      print('Message not sent: ${e.toString()}');
-      // Handle specific problems
-      for (var p in e.problems) {
-        print('Problem: ${p.code}: ${p.msg}');
-      }
-    } catch (e) {
-      // Handle other exceptions
-      print('Unexpected error: $e');
-    }
-  }
-
-
-  // use hosted mail account on server
-  Future<void> sendEmailOTPssl() async {
-    // Replace these with your actual Gmail credentials
-    final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
-    final password = 'Ankit@123\$#'; // Your Gmail password
-
-    // Recipient email address
-    final destinationMail = 'guddulawaniya123@gmail.com';
-
-    // Specify the SMTP server details including port for SSL
-    final smtpServer = SmtpServer(
-      'smtp.hostinger.com',
-      username: username,
-      password: password,
-      port: 465,
-      ssl: true,
-    );
-
-    // Create email message
-    final message = Message()
-      ..from = Address(username, 'Testing mail')
-      ..recipients.add(username)
-      ..subject = 'Testing purpose'
-      ..text = 'guddulawaniya sending the sms for testing purpose';
-
-    try {
-      // Send email
-      final sendReport = await send(message, smtpServer);
-      print('Message sent: $sendReport');
-    } on MailerException catch (e) {
-      print('Message not sent: ${e.toString()}');
-      // Handle specific problems
-      for (var p in e.problems) {
-        print('Problem: ${p.code}: ${p.msg}');
-      }
-    } catch (e) {
-      // Handle other exceptions
-      print('Unexpected error: $e');
-    }
-  }
 
   @override
   void initState() {
     super.initState();
   }
 
+  // Validation function for the Dealer Code field
+  String? _validateDealerCode(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter the Dealer Code';
+    }
+    return null; // Return null if validation passes
+  }
+
+// Validation function for the IMEI Number field
+  String? _validateIMEINumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter the IMEI Number';
+    }
+    return null; // Return null if validation passes
+  }
+
+// Validation function for the Sim Number field
+  String? _validateSimNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter the Sim Number';
+    }
+    return null; // Return null if validation passes
+  }
+
+// Validation function for the City field
+  String? _validateCity(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please select the City';
+    }
+    return null; // Return null if validation passes
+  }
+
+// Validation function for the Pincode field
+  String? _validatePincode(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter the Pincode';
+    }
+    return null; // Return null if validation passes
+  }
+
+// Validation function for the Email field
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter the Email';
+    }
+    // You can add more specific email validation logic here if needed
+    return null; // Return null if validation passes
+  }
+
+// Validation function for the Address field
+  String? _validateAddress(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter the Address';
+    }
+    return null; // Return null if validation passes
+  }
+
+// Validation function for the User Name field
+  String? _validateUserName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter the User Name';
+    }
+    return null; // Return null if validation passes
+  }
+
+  // Validation function for the country field
+  String? _validateCountryselect(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter Select Country';
+    }
+    return null; // Return null if validation passes
+  }
+
+  String? _validateStateselect(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter Select State';
+    }
+    return null; // Return null if validation passes
+  }
+
+  String? _validateMobilenumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter the Mobile Number';
+    }
+    return null; // Return null if validation passes
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter Your Name';
+    }
+    return null; // Return null if validation passes
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -221,46 +232,92 @@ class _MyHomePageState extends State<MyHomePage> {
                         CustomTextView(
                           text: "Dealer Code ",
                           hinttext: 'Dealer Code',
-                          // controller: _nameController,
+                          controller: _dealerController,
+                          validator: _validateDealerCode,
+                          onChanged: (String value) {
+                            registerUser(context);
+                          },
+                          inputType: TextInputType.number,
                         ),
                         CustomTextView(
                           text: "IMEI Number ",
                           hinttext: 'IMEI Number',
+                          controller: _imeinumberController,
+                          validator: _validateIMEINumber,
+                          onChanged: (String value) {
+                            registerUser(context);
+                          },
+                          inputType: TextInputType.number,
                         ),
                         CustomTextView(
                           text: "Sim Number ",
                           hinttext: 'Sim Number',
+                          controller: _simnumberController,
+                          validator: _validateSimNumber,
+                          onChanged: (String value) {
+                            registerUser(context);
+                          },
+                          inputType: TextInputType.number,
                         ),
                         CustomAutocomplete(
                           text: "Vechicle Types ",
                           hinttext: 'Enter like bus',
                           items: vehiclelist,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please select a vehicle type';
+                            }
+                            // Add more validation logic if needed
+                            return null; // Return null if validation passes
+                          },
+                          onChanged: (value) {
+                            _selectedVehicleType = value;
+                          },
                         ),
-
                         CustomAutocomplete(
                           text: "Select Device Model",
                           hinttext: 'Pl06',
-                          items: ['P106', 'P1062',],
-
+                          items: devicelist,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter a vehicle type';
+                            }
+                            // Add more validation logic if needed
+                            return null; // Return null if validation passes
+                          },
+                          onChanged: (value) {
+                            _selectedDeviceModel = value;
+                          },
                         ),
                         CustomAutocomplete(
                           text: "New user ",
                           hinttext: 'Enter new User',
                           items: userlist,
-                          onChanged: (String value){
-                            // isNewUser = (value == 'New User');
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter a vehicle type';
+                            }
+                            // Add more validation logic if needed
+                            return null; // Return null if validation passes
+                          },
+                          onChanged: (value) {
+                            _selectedUserType = value;
                             setState(() {
                               isNewUser = (value != 'Already Have Account');
                             });
                           },
                         ),
-
                         Visibility(
                           visible: isNewUser,
                           child: CustomTextView(
                             text: "Name ",
                             hinttext: 'Your name',
-                            // controller: _nameController,
+                            controller: _nameController,
+                            validator: _validateName,
+                            onChanged: (String value) {
+                              registerUser(context);
+                            },
+                            inputType: TextInputType.text,
                           ),
                         ),
                         Visibility(
@@ -268,7 +325,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: CustomTextView(
                             text: "Mobile Number ",
                             hinttext: 'Phone Number to contact you',
-                            // controller: _mobileNumberController,
+                            maxlenght: 10,
+                            controller: _mobileNumberController,
+                            validator: _validateMobilenumber,
+                            onChanged: (String value) {
+                              registerUser(context);
+                            },
+                            inputType: TextInputType.number,
                           ),
                         ),
                         Visibility(
@@ -277,6 +340,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             text: "Country ",
                             hinttext: 'Select Country',
                             items: countrylist,
+                            validator: _validateCountryselect,
                             onChanged: (value) {
                               _selectedCountry = value;
                             },
@@ -288,26 +352,37 @@ class _MyHomePageState extends State<MyHomePage> {
                             text: "State ",
                             hinttext: 'Select State',
                             items: statelist,
+                            validator: _validateStateselect,
                             onChanged: (value) {
-
+                              _selectedState = value;
                             },
                           ),
                         ),
-
-
                         Visibility(
                           visible: isNewUser,
                           child: CustomTextView(
                             text: "City ",
                             hinttext: 'Select City',
-                            // controller: _pincodeController,
+                            controller: _cityController,
+                            validator: _validateCity,
+                            onChanged: (String value) {
+                              registerUser(context);
+                            },
+                            inputType: TextInputType.streetAddress,
                           ),
-                        ), Visibility(
+                        ),
+                        Visibility(
                           visible: isNewUser,
                           child: CustomTextView(
                             text: "Pincode ",
                             hinttext: 'Enter Pincode',
-                            // controller: _pincodeController,
+                            controller: _pincodeController,
+                            validator: _validatePincode,
+                            onChanged: (String value) {
+                              registerUser(context);
+                            },
+                            maxlenght: 6,
+                            inputType: TextInputType.number,
                           ),
                         ),
                         Visibility(
@@ -315,7 +390,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: CustomTextView(
                             text: "Email ",
                             hinttext: 'Enter Email',
-                            // controller: _emailController,
+                            controller: _emailController,
+                            validator: _validateEmail,
+                            onChanged: (String value) {
+                              registerUser(context);
+                            }, inputType: TextInputType.emailAddress,
                           ),
                         ),
                         Visibility(
@@ -323,13 +402,22 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: CustomTextView(
                             text: "Address ",
                             hinttext: 'Enter you address',
-                            // controller: _addressController,
+                            controller: _addressController,
+                            validator: _validateAddress,
+                            onChanged: (String value) {
+                              registerUser(context);
+                            }, inputType: TextInputType.streetAddress,
                           ),
                         ),
                         CustomTextView(
                           text: "User Name ",
                           hinttext: 'User Name',
-                          // controller: _userNameController,
+                          controller: _userNameController,
+                          validator: _validateUserName,
+                          onChanged: (String value) {
+                            registerUser(context);
+                          },
+                          inputType: TextInputType.text,
                         ),
                       ],
                     ),
@@ -349,24 +437,46 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           onPressed: () {
                             sendEmailOTPssl();
-                            // Fluttertoast.showToast(
-                            //   msg: "Button Click",
-                            //   toastLength: Toast.LENGTH_SHORT,
-                            //   // Duration for which the toast is visible
-                            //   gravity: ToastGravity.BOTTOM,
-                            //   // Position of the toast on the screen
-                            //   backgroundColor: Colors.black,
-                            //   // Background color of the toast
-                            //   textColor: Colors.white,
-                            //   // Text color of the toast message
-                            //   fontSize: 16.0,
-                            // );
-
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //       builder: (context) => const uploaddata()),
-                            // );
+                            // registerUser();
+                            if (_formKey.currentState!.validate()) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Registered User Data'),
+                                    content: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text('Name: $name'),
+                                        Text('Mobile Number: $mobileNumber'),
+                                        Text('Pincode: $pincode'),
+                                        Text('Email: $email'),
+                                        Text('Address: $address'),
+                                        Text('User Name: $userName'),
+                                        Text('Vehicle Type: $vehicleType'),
+                                        Text('Device Model: $deviceModel'),
+                                        Text('User Type: $userType'),
+                                        Text('Country: $country'),
+                                        Text('State: $state'),
+                                        Text('City: $city'),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(); // Close the dialog
+                                        },
+                                        child: Text('Close'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                            // Show alert dialog with user data
                           },
                           child: const Text(
                             'Register',
@@ -386,4 +496,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-

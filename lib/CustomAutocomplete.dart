@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class _CustomAutocompleteState extends State<CustomAutocomplete> {
   String? dropdownValue;
+  String? errorText; // Track the error message
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class _CustomAutocompleteState extends State<CustomAutocomplete> {
             height: 2,
           ),
           Container(
-            padding: const EdgeInsets.only(left: 10,right: 10),
+            padding: const EdgeInsets.only(left: 10, right: 10),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(5.0),
@@ -44,10 +45,7 @@ class _CustomAutocompleteState extends State<CustomAutocomplete> {
               value: dropdownValue,
               underline: Container(),
               icon: const Icon(Icons.keyboard_arrow_down),
-              style: const TextStyle(
-                  color: Colors.black
-
-              ),
+              style: const TextStyle(color: Colors.black),
               isExpanded: true,
               hint: const Text('select'),
               borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -60,24 +58,30 @@ class _CustomAutocompleteState extends State<CustomAutocomplete> {
               onChanged: (String? newValue) {
                 setState(() {
                   dropdownValue = newValue!;
+                  errorText = widget.validator?.call(newValue);
                 });
                 widget.onChanged?.call(newValue ?? '');
               },
-
             ),
           ),
+          if (errorText != null)
+            Text(
+              errorText!,
+              style: TextStyle(color: Colors.red),
+            ),
         ],
       ),
     );
-
   }
 }
+
 
 class CustomAutocomplete extends StatefulWidget {
   final String text;
   final String hinttext;
   final List<String> items;
   final ValueChanged<String>? onChanged;
+  final String? Function(String?)? validator;
 
   const CustomAutocomplete({
     Key? key,
@@ -85,6 +89,7 @@ class CustomAutocomplete extends StatefulWidget {
     required this.hinttext,
     required this.items,
     this.onChanged,
+    this.validator, // Optional validation function
   }) : super(key: key);
 
   @override
