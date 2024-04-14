@@ -4,6 +4,8 @@ import 'package:data_send_mail/SplashScreen.dart';
 import 'package:data_send_mail/login.dart';
 import 'package:data_send_mail/otp_verification.dart';
 import 'package:flutter/material.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 import 'content_provider.dart';
 
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Form',
       debugShowCheckedModeBanner: false,
-      initialRoute: "splash",
+      // initialRoute: "splash",
       routes: {
         'splash': (context) => splashScreen(),
         '/login': (context) => loginpage(),
@@ -54,7 +56,6 @@ String? _selectedDeviceModel;
 String? _selectedUserType;
 String? _selectedCountry;
 String? _selectedState;
-String? _selectedCity;
 
 TextEditingController _dealerController = TextEditingController();
 TextEditingController _nameController = TextEditingController();
@@ -86,12 +87,17 @@ String userType = _selectedUserType ?? '';
 String country = _selectedCountry ?? '';
 String state = _selectedState ?? '';
 
+
+
+bool _isValidallfields=false;
+
 void registerUser(BuildContext context) {
   // Validate all form fields
   final bool isValid = _formKey.currentState!.validate();
   if (!isValid) {
     return;
   }
+
 }
 
 @override
@@ -208,6 +214,95 @@ class _MyHomePageState extends State<MyHomePage> {
     return null; // Return null if validation passes
   }
 
+  bool isLoading = false;
+
+  Future<void> sendEmailOTPssl(BuildContext context) async {
+    setState(() {
+      isLoading = true; // Show loader
+    });
+
+    // Replace these with your actual Gmail credentials
+    final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
+    final password = 'Ankit@123\$#'; // Your Gmail password
+
+    // Recipient email address
+    final destinationMail = 'guddulawaniya123@gmail.com';
+
+    // Specify the SMTP server details including port for SSL
+    final smtpServer = SmtpServer(
+      'smtp.hostinger.com',
+      username: username,
+      password: password,
+      port: 465,
+      ssl: true,
+    );
+
+    final recipients = ['test@braj.tbvcsoft.com'];
+
+    // Create email message
+    final message = Message()
+      ..from = Address(username, 'Testing mail')
+      ..recipients.add(destinationMail)
+      ..subject = 'Testing purpose'
+      ..html = generateHtmlEmail();
+
+    for (final recipient in recipients) {
+      // Set the recipient email address
+      message.recipients.add(recipient);
+
+      try {
+        // Send email
+        final sendReport = await send(message, smtpServer);
+        print('Message sent to $recipient: $sendReport');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Email Send Successfully'),
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Message sent to $recipient: $sendReport'),
+                  // Text('Name: $name'),
+                  // Text('Mobile Number: $mobileNumber'),
+                  // Text('Pincode: $pincode'),
+                  // Text('Email: $email'),
+                  // Text('Address: $address'),
+                  // Text('User Name: $userName'),
+                  // Text('Vehicle Type: $vehicleType'),
+                  // Text('Device Model: $deviceModel'),
+                  // Text('User Type: $userType'),
+                  // Text('Country: $country'),
+                  // Text('State: $state'),
+                  // Text('City: $city'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: Text('Ok'),
+                ),
+              ],
+            );
+          },
+        );
+      } catch (e) {
+        print('Failed to send message to $recipient: $e');
+        // Handle error for individual recipient
+      }
+
+      // Clear recipients list for the next iteration
+      message.recipients.clear();
+    }
+
+    setState(() {
+      isLoading = false; // Hide loader
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -215,283 +310,277 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Container(
-        decoration: BoxDecoration(color: Colors.white),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Container(
-                    margin: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CustomTextView(
-                          text: "Dealer Code ",
-                          hinttext: 'Dealer Code',
-                          controller: _dealerController,
-                          validator: _validateDealerCode,
-                          onChanged: (String value) {
-                            registerUser(context);
-                          },
-                          inputType: TextInputType.number,
+      body: Stack(
+        children: [
+        Container(
+            decoration: BoxDecoration(color: Colors.white),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: Container(
+                        margin: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            CustomTextView(
+                              text: "Dealer Code ",
+                              hinttext: 'Dealer Code',
+                              controller: _dealerController,
+                              validator: _validateDealerCode,
+                              onChanged: (String value) {
+
+                                if(_dealerController.text.isNotEmpty)
+                                {
+                                  _validateDealerCode(value);
+                                }
+                              },
+                              inputType: TextInputType.number,
+                            ),
+                            CustomTextView(
+                              text: "IMEI Number ",
+                              hinttext: 'IMEI Number',
+                              controller: _imeinumberController,
+                              validator: _validateIMEINumber,
+                              onChanged: (String value) {
+                                registerUser(context);
+                              },
+                              inputType: TextInputType.number,
+                            ),
+                            CustomTextView(
+                              text: "Sim Number ",
+                              hinttext: 'Sim Number',
+                              controller: _simnumberController,
+                              validator: _validateSimNumber,
+                              onChanged: (String value) {
+                                registerUser(context);
+                              },
+                              inputType: TextInputType.number,
+                            ),
+                            CustomAutocomplete(
+                              text: "Vechicle Types ",
+                              hinttext: 'Enter like bus',
+                              items: vehiclelist,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please select a vehicle type';
+                                }
+                                // Add more validation logic if needed
+                                return null; // Return null if validation passes
+                              },
+                              onChanged: (value) {
+                                _selectedVehicleType = value;
+                              },
+                            ),
+                            CustomAutocomplete(
+                              text: "Select Device Model",
+                              hinttext: 'Pl06',
+                              items: devicelist,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a vehicle type';
+                                }
+                                // Add more validation logic if needed
+                                return null; // Return null if validation passes
+                              },
+                              onChanged: (value) {
+                                _selectedDeviceModel = value;
+                              },
+                            ),
+                            CustomAutocomplete(
+                              text: "New user ",
+                              hinttext: 'Enter new User',
+                              items: userlist,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a vehicle type';
+                                }
+                                // Add more validation logic if needed
+                                return null; // Return null if validation passes
+                              },
+                              onChanged: (value) {
+                                _selectedUserType = value;
+                                setState(() {
+                                  isNewUser = (value != 'Already Have Account');
+                                });
+                              },
+                            ),
+                            Visibility(
+                              visible: isNewUser,
+                              child: CustomTextView(
+                                text: "Name ",
+                                hinttext: 'Your name',
+                                controller: _nameController,
+                                validator: _validateName,
+                                onChanged: (String value) {
+                                  registerUser(context);
+                                },
+                                inputType: TextInputType.text,
+                              ),
+                            ),
+                            Visibility(
+                              visible: isNewUser,
+                              child: CustomTextView(
+                                text: "Mobile Number ",
+                                hinttext: 'Phone Number to contact you',
+                                maxlenght: 10,
+                                controller: _mobileNumberController,
+                                validator: _validateMobilenumber,
+                                onChanged: (String value) {
+                                  registerUser(context);
+                                },
+                                inputType: TextInputType.number,
+                              ),
+                            ),
+                            Visibility(
+                              visible: isNewUser,
+                              child: CustomAutocomplete(
+                                text: "Country ",
+                                hinttext: 'Select Country',
+                                items: countrylist,
+                                validator: _validateCountryselect,
+                                onChanged: (value) {
+                                  _selectedCountry = value;
+                                },
+                              ),
+                            ),
+                            Visibility(
+                              visible: isNewUser,
+                              child: CustomAutocomplete(
+                                text: "State ",
+                                hinttext: 'Select State',
+                                items: statelist,
+                                validator: _validateStateselect,
+                                onChanged: (value) {
+                                  _selectedState = value;
+                                },
+                              ),
+                            ),
+                            Visibility(
+                              visible: isNewUser,
+                              child: CustomTextView(
+                                text: "City ",
+                                hinttext: 'Select City',
+                                controller: _cityController,
+                                validator: _validateCity,
+                                onChanged: (String value) {
+                                  registerUser(context);
+                                },
+                                inputType: TextInputType.streetAddress,
+                              ),
+                            ),
+                            Visibility(
+                              visible: isNewUser,
+                              child: CustomTextView(
+                                text: "Pincode ",
+                                hinttext: 'Enter Pincode',
+                                controller: _pincodeController,
+                                validator: _validatePincode,
+                                onChanged: (String value) {
+                                  registerUser(context);
+                                },
+                                maxlenght: 6,
+                                inputType: TextInputType.number,
+                              ),
+                            ),
+                            Visibility(
+                              visible: isNewUser,
+                              child: CustomTextView(
+                                text: "Email ",
+                                hinttext: 'Enter Email',
+                                controller: _emailController,
+                                validator: _validateEmail,
+                                onChanged: (String value) {
+                                  registerUser(context);
+                                },inputType: TextInputType.emailAddress,
+                              ),
+                            ),
+                            Visibility(
+                              visible: isNewUser,
+                              child: CustomTextView(
+                                text: "Address ",
+                                hinttext: 'Enter you address',
+                                controller: _addressController,
+                                validator: _validateAddress,
+                                onChanged: (String value) {
+                                  registerUser(context);
+                                }, inputType: TextInputType.streetAddress,
+                              ),
+                            ),
+                            CustomTextView(
+                              text: "User Name ",
+                              hinttext: 'User Name',
+                              controller: _userNameController,
+                              validator: _validateUserName,
+                              onChanged: (String value) {
+                                registerUser(context);
+                              },
+                              inputType: TextInputType.text,
+                            ),
+                          ],
                         ),
-                        CustomTextView(
-                          text: "IMEI Number ",
-                          hinttext: 'IMEI Number',
-                          controller: _imeinumberController,
-                          validator: _validateIMEINumber,
-                          onChanged: (String value) {
-                            registerUser(context);
-                          },
-                          inputType: TextInputType.number,
-                        ),
-                        CustomTextView(
-                          text: "Sim Number ",
-                          hinttext: 'Sim Number',
-                          controller: _simnumberController,
-                          validator: _validateSimNumber,
-                          onChanged: (String value) {
-                            registerUser(context);
-                          },
-                          inputType: TextInputType.number,
-                        ),
-                        CustomAutocomplete(
-                          text: "Vechicle Types ",
-                          hinttext: 'Enter like bus',
-                          items: vehiclelist,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please select a vehicle type';
-                            }
-                            // Add more validation logic if needed
-                            return null; // Return null if validation passes
-                          },
-                          onChanged: (value) {
-                            _selectedVehicleType = value;
-                          },
-                        ),
-                        CustomAutocomplete(
-                          text: "Select Device Model",
-                          hinttext: 'Pl06',
-                          items: devicelist,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a vehicle type';
-                            }
-                            // Add more validation logic if needed
-                            return null; // Return null if validation passes
-                          },
-                          onChanged: (value) {
-                            _selectedDeviceModel = value;
-                          },
-                        ),
-                        CustomAutocomplete(
-                          text: "New user ",
-                          hinttext: 'Enter new User',
-                          items: userlist,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a vehicle type';
-                            }
-                            // Add more validation logic if needed
-                            return null; // Return null if validation passes
-                          },
-                          onChanged: (value) {
-                            _selectedUserType = value;
-                            setState(() {
-                              isNewUser = (value != 'Already Have Account');
-                            });
-                          },
-                        ),
-                        Visibility(
-                          visible: isNewUser,
-                          child: CustomTextView(
-                            text: "Name ",
-                            hinttext: 'Your name',
-                            controller: _nameController,
-                            validator: _validateName,
-                            onChanged: (String value) {
-                              registerUser(context);
-                            },
-                            inputType: TextInputType.text,
-                          ),
-                        ),
-                        Visibility(
-                          visible: isNewUser,
-                          child: CustomTextView(
-                            text: "Mobile Number ",
-                            hinttext: 'Phone Number to contact you',
-                            maxlenght: 10,
-                            controller: _mobileNumberController,
-                            validator: _validateMobilenumber,
-                            onChanged: (String value) {
-                              registerUser(context);
-                            },
-                            inputType: TextInputType.number,
-                          ),
-                        ),
-                        Visibility(
-                          visible: isNewUser,
-                          child: CustomAutocomplete(
-                            text: "Country ",
-                            hinttext: 'Select Country',
-                            items: countrylist,
-                            validator: _validateCountryselect,
-                            onChanged: (value) {
-                              _selectedCountry = value;
-                            },
-                          ),
-                        ),
-                        Visibility(
-                          visible: isNewUser,
-                          child: CustomAutocomplete(
-                            text: "State ",
-                            hinttext: 'Select State',
-                            items: statelist,
-                            validator: _validateStateselect,
-                            onChanged: (value) {
-                              _selectedState = value;
-                            },
-                          ),
-                        ),
-                        Visibility(
-                          visible: isNewUser,
-                          child: CustomTextView(
-                            text: "City ",
-                            hinttext: 'Select City',
-                            controller: _cityController,
-                            validator: _validateCity,
-                            onChanged: (String value) {
-                              registerUser(context);
-                            },
-                            inputType: TextInputType.streetAddress,
-                          ),
-                        ),
-                        Visibility(
-                          visible: isNewUser,
-                          child: CustomTextView(
-                            text: "Pincode ",
-                            hinttext: 'Enter Pincode',
-                            controller: _pincodeController,
-                            validator: _validatePincode,
-                            onChanged: (String value) {
-                              registerUser(context);
-                            },
-                            maxlenght: 6,
-                            inputType: TextInputType.number,
-                          ),
-                        ),
-                        Visibility(
-                          visible: isNewUser,
-                          child: CustomTextView(
-                            text: "Email ",
-                            hinttext: 'Enter Email',
-                            controller: _emailController,
-                            validator: _validateEmail,
-                            onChanged: (String value) {
-                              registerUser(context);
-                            }, inputType: TextInputType.emailAddress,
-                          ),
-                        ),
-                        Visibility(
-                          visible: isNewUser,
-                          child: CustomTextView(
-                            text: "Address ",
-                            hinttext: 'Enter you address',
-                            controller: _addressController,
-                            validator: _validateAddress,
-                            onChanged: (String value) {
-                              registerUser(context);
-                            }, inputType: TextInputType.streetAddress,
-                          ),
-                        ),
-                        CustomTextView(
-                          text: "User Name ",
-                          hinttext: 'User Name',
-                          controller: _userNameController,
-                          validator: _validateUserName,
-                          onChanged: (String value) {
-                            registerUser(context);
-                          },
-                          inputType: TextInputType.text,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Container(
-                  margin: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            backgroundColor:
+                  Container(
+                      margin: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                backgroundColor:
                                 MaterialStateProperty.all<Color>(Colors.blue),
-                          ),
-                          onPressed: () {
-                            sendEmailOTPssl();
-                            // registerUser();
-                            if (_formKey.currentState!.validate()) {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Registered User Data'),
-                                    content: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text('Name: $name'),
-                                        Text('Mobile Number: $mobileNumber'),
-                                        Text('Pincode: $pincode'),
-                                        Text('Email: $email'),
-                                        Text('Address: $address'),
-                                        Text('User Name: $userName'),
-                                        Text('Vehicle Type: $vehicleType'),
-                                        Text('Device Model: $deviceModel'),
-                                        Text('User Type: $userType'),
-                                        Text('Country: $country'),
-                                        Text('State: $state'),
-                                        Text('City: $city'),
-                                      ],
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // Close the dialog
-                                        },
-                                        child: Text('Close'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            }
-                            // Show alert dialog with user data
-                          },
-                          child: const Text(
-                            'Register',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              ),
+                              onPressed: () {
+                                _isValidallfields = false;
+                                if (_formKey.currentState!.validate())
+                                {
+                                  sendEmailOTPssl(context);
+                                }
+
+                                // registerUser(_isValidallfields);
+
+                                name='';
+                                mobileNumber = '';
+                                pincode = '';
+                                email = '';
+                                address = '';
+                                userName = '';
+                                vehicleType = '';
+                                deviceModel = '';
+                                userType = '';
+                                country = '';
+                                state = '';
+                                city = '';
+
+                                // Show alert dialog with user data
+                              },
+                              child: const Text(
+                                'Register',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      )
-                    ],
-                  )),
-            ],
+                          )
+                        ],
+                      )),
+                ],
+              ),
+            ),
           ),
-        ),
+          if (isLoading)
+            Center(
+              child: CircularProgressIndicator(),
+            ),
+        ],
       ),
     );
   }

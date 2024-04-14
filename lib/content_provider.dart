@@ -1,6 +1,7 @@
 
 //worked normal gsmtp account
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 
@@ -8,6 +9,8 @@ import 'main.dart';
 
 
 Future<void> sendEmailOTP() async {
+
+
   // Replace these with your actual Gmail credentials
   final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
   final password = 'Ankit@123\$#'; // Your Gmail password
@@ -43,7 +46,7 @@ Future<void> sendEmailOTP() async {
 
 
 // use hosted mail account on server
-Future<void> sendEmailOTPssl() async {
+Future<void> sendEmailOTPssl(BuildContext context) async {
   // Replace these with your actual Gmail credentials
   // final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
   final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
@@ -61,7 +64,7 @@ Future<void> sendEmailOTPssl() async {
     ssl: true,
   );
 
-  final recipients = ['guddulawaniya123@gmail.com', 'test@braj.tbvcsoft.com','dealer@lostmod.com'];
+  final recipients = ['test@braj.tbvcsoft.com'];
 
 
 
@@ -70,7 +73,7 @@ Future<void> sendEmailOTPssl() async {
     ..from = Address(username, 'Testing mail')
     ..recipients.add(email)
     ..subject = 'Testing purpose'
-  ..html = generateHtmlEmail();
+    ..html = generateHtmlEmail();
 
 
   for (final recipient in recipients) {
@@ -81,6 +84,43 @@ Future<void> sendEmailOTPssl() async {
       // Send email
       final sendReport = await send(message, smtpServer);
       print('Message sent to $recipient: $sendReport');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Registered User Data'),
+            content: Column(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                 Text('Message sent to $recipient: $sendReport'),
+                // Text('Name: $name'),
+                // Text('Mobile Number: $mobileNumber'),
+                // Text('Pincode: $pincode'),
+                // Text('Email: $email'),
+                // Text('Address: $address'),
+                // Text('User Name: $userName'),
+                // Text('Vehicle Type: $vehicleType'),
+                // Text('Device Model: $deviceModel'),
+                // Text('User Type: $userType'),
+                // Text('Country: $country'),
+                // Text('State: $state'),
+                // Text('City: $city'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .pop(); // Close the dialog
+                },
+                child: Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
     } catch (e) {
       print('Failed to send message to $recipient: $e');
       // Handle error for individual recipient
@@ -115,7 +155,7 @@ String generateHtmlEmail() {
 </head>
 <body>
   <div style="font-family: Arial, sans-serif;">
-    <h2 style="color: #007bff;">Testing Email Template</h2>
+    <h2 style="color: #007bff;">Testing Email </h2>
        <table border="1">
                                               <tr>
                                                 <th>Field</th>
