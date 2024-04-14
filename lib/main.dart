@@ -4,6 +4,7 @@ import 'package:data_send_mail/SplashScreen.dart';
 import 'package:data_send_mail/login.dart';
 import 'package:data_send_mail/otp_verification.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Form',
       debugShowCheckedModeBanner: false,
-      // initialRoute: "splash",
+      initialRoute: "splash",
       routes: {
         'splash': (context) => splashScreen(),
         '/login': (context) => loginpage(),
@@ -89,11 +90,10 @@ String state = _selectedState ?? '';
 
 
 
-bool _isValidallfields=false;
-
 void registerUser(BuildContext context) {
   // Validate all form fields
   final bool isValid = _formKey.currentState!.validate();
+
   if (!isValid) {
     return;
   }
@@ -237,12 +237,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ssl: true,
     );
 
-    final recipients = ['test@braj.tbvcsoft.com'];
+    final recipients = ['test@braj.tbvcsoft.com','guddulawaniya123@gmail.com'];
+
 
     // Create email message
     final message = Message()
       ..from = Address(username, 'Testing mail')
-      ..recipients.add(destinationMail)
+      // ..recipients.add(destinationMail)
       ..subject = 'Testing purpose'
       ..html = generateHtmlEmail();
 
@@ -264,23 +265,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('Message sent to $recipient: $sendReport'),
-                  // Text('Name: $name'),
-                  // Text('Mobile Number: $mobileNumber'),
-                  // Text('Pincode: $pincode'),
-                  // Text('Email: $email'),
-                  // Text('Address: $address'),
-                  // Text('User Name: $userName'),
-                  // Text('Vehicle Type: $vehicleType'),
-                  // Text('Device Model: $deviceModel'),
-                  // Text('User Type: $userType'),
-                  // Text('Country: $country'),
-                  // Text('State: $state'),
-                  // Text('City: $city'),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () {
+                    _dealerController.text= "";
+                    _nameController.text = "";
+                    _mobileNumberController.text="";
+                    _pincodeController.text='';
+                    _emailController.text='';
+                    _addressController.text='';
+                    _userNameController.text='';
+                    _cityController.text='';
+                    _imeinumberController.text='';
+                    _emailController.text= '';
                     Navigator.of(context).pop(); // Close the dialog
                   },
                   child: Text('Ok'),
@@ -293,7 +292,6 @@ class _MyHomePageState extends State<MyHomePage> {
         print('Failed to send message to $recipient: $e');
         // Handle error for individual recipient
       }
-
       // Clear recipients list for the next iteration
       message.recipients.clear();
     }
@@ -333,11 +331,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               controller: _dealerController,
                               validator: _validateDealerCode,
                               onChanged: (String value) {
-
-                                if(_dealerController.text.isNotEmpty)
-                                {
-                                  _validateDealerCode(value);
-                                }
+                                  registerUser(context);
                               },
                               inputType: TextInputType.number,
                             ),
@@ -538,26 +532,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                 MaterialStateProperty.all<Color>(Colors.blue),
                               ),
                               onPressed: () {
-                                _isValidallfields = false;
-                                if (_formKey.currentState!.validate())
-                                {
-                                  sendEmailOTPssl(context);
-                                }
-
-                                // registerUser(_isValidallfields);
-
-                                name='';
-                                mobileNumber = '';
-                                pincode = '';
-                                email = '';
-                                address = '';
-                                userName = '';
-                                vehicleType = '';
-                                deviceModel = '';
-                                userType = '';
-                                country = '';
-                                state = '';
-                                city = '';
+                                // _isValidallfields = false;
+                                final bool isValid = _formKey.currentState!.validate();
+                                if (isValid)
+                                  {
+                                    sendEmailOTPssl(context);
+                                  }
 
                                 // Show alert dialog with user data
                               },

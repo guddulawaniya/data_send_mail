@@ -46,7 +46,7 @@ Future<void> sendEmailOTP() async {
 
 
 // use hosted mail account on server
-Future<void> sendEmailOTPssl(BuildContext context) async {
+Future<void> sendEmailOTPssls(BuildContext context) async {
   // Replace these with your actual Gmail credentials
   // final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
   final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
