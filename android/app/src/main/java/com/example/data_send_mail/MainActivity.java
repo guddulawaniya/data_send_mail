@@ -1,4 +1,4 @@
-package com.example.data_send_mail;
+package com.lost_email.dataSendmail;
 
 import io.flutter.embedding.android.FlutterActivity;
 

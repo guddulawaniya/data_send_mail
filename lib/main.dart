@@ -1,6 +1,7 @@
 import 'package:data_send_mail/CustomAutocomplete.dart';
 import 'package:data_send_mail/CustomTextView.dart';
 import 'package:data_send_mail/SplashScreen.dart';
+import 'package:data_send_mail/dashboard.dart';
 import 'package:data_send_mail/login.dart';
 import 'package:data_send_mail/otp_verification.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: "splash",
       routes: {
+        'dashboardpage': (context) => dashboardpage(),
         'splash': (context) => SplashScreen(),
         '/login': (context) => loginpage(),
         '/mainepage': (context) => MyHomePage(
@@ -289,15 +291,15 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     // Replace these with your actual Gmail credentials
-    final username = 'test@braj.tbvcsoft.com'; // Your Gmail username
-    final password = 'Ankit@123\$#'; // Your Gmail password
+    final username = 'dealer@lostmod.com'; // Your Gmail username
+    final password = 'RadheRadhe@108'; // Your Gmail password
 
     // Replace these with your actual Gmail credentials
     // const username = 'sales@lostmod.com'; // Your Gmail username
     // const password = 'mO2IAQQ6R@1'; // Your Gmail password
 
     // Recipient email address
-    final destinationMail = 'guddulawaniya123@gmail.com';
+    final destinationMail = 'dealer@lostmod.com';
 
     // Specify the SMTP server details including port for SSL
     final smtpServer = SmtpServer(
@@ -309,18 +311,14 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     bool isSendcheck = false;
 
-    final recipients = ['test@braj.tbvcsoft.com', 'guddulawaniya123@gmail.com'];
+    // final recipients = ['test@braj.tbvcsoft.com', 'guddulawaniya123@gmail.com'];
 
     // Create email message
     final message = Message()
       ..from = Address(username, 'Testing mail')
-      // ..recipients.add(destinationMail)
+      ..recipients.add(destinationMail)
       ..subject = 'Testing purpose'
       ..html = generateHtmlEmail();
-
-    for (final recipient in recipients) {
-      // Set the recipient email address
-      message.recipients.add(recipient);
 
       try {
         // Send email
@@ -328,12 +326,11 @@ class _MyHomePageState extends State<MyHomePage> {
         showSuccessDialog(context,'Message has been sent successfully','Email Sent Successfully');
       } catch (e) {
         showSuccessDialog(context,'Message has been not sent successfully','Failed to send message');
-        print('Failed to send message to $recipient: $e');
+        // print('Failed to send message to $recipient: $e');
         // Handle error for individual recipient
       }
       // Clear recipients list for the next iteration
       message.recipients.clear();
-    }
 
     setState(() {
       isLoading = false; // Hide loader
